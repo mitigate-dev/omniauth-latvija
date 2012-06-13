@@ -17,7 +17,7 @@ Provides the following authentication types:
 ## Installation
 
 ```ruby
-gem install omniauth-latvija
+gem 'omniauth-latvija', :git => 'http://github.com/ebeigarts/omniauth-latvija.git'
 ```
 
 ## Usage
