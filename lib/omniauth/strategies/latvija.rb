@@ -66,6 +66,7 @@ module OmniAuth
             'last_name' => @response.attributes['surname'],
             'private_personal_identifier' => @response.attributes['privatepersonalidentifier']
           },
+          'authentication_method' => @response.authentication_method,
           'extra' => @response.attributes
         })
       end

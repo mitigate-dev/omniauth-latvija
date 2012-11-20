@@ -17,6 +17,12 @@ module OmniAuth
           document.validate!(fingerprint)
         end
 
+        def authentication_method
+          @authentication_method ||= begin
+            REXML::XPath.first(document, "//saml:AuthenticationStatement").attributes['AuthenticationMethod']
+          end
+        end
+
         # A hash of alle the attributes with the response. Assuming there is only one value for each key
         def attributes
           @attributes ||= begin
