@@ -39,6 +39,7 @@ module OmniAuth
           :wctx => callback_url,
           :wreq => '<trust:RequestSecurityToken xmlns:trust="http://docs.oasis-open.org/ws-sx/ws-trust/200512"><trust:Claims xmlns:i="http://schemas.xmlsoap.org/ws/2005/05/identity" Dialect="http://schemas.xmlsoap.org/ws/2005/05/identity"><i:ClaimType Uri="http://docs.oasis-open.org/wsfed/authorization/200706/claims/action" Optional="false" /></trust:Claims><trust:RequestType>http://docs.oasis-open.org/ws-sx/ws-trust/200512/Issue</trust:RequestType></trust:RequestSecurityToken>'
         }
+        params[:wfresh] = @options[:wfresh] if @options[:wfresh]
         query_string = params.collect{ |key, value| "#{key}=#{Rack::Utils.escape(value)}" }.join('&')
         redirect "#{options[:endpoint]}?#{query_string}"
       end
