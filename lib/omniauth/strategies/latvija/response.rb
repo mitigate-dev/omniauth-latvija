@@ -34,12 +34,13 @@ module OmniAuth::Strategies
       def attributes
         @attributes ||= begin
           result = {}
-          stmt_element = xml.xpath('//a:Assertion/a:AttributeStatement', a: ASSERTION)
-          return {} if stmt_element.nil?
 
-          stmt_element.children.each do |element|
-            name  = element.attribute("AttributeName")
-            value = element.children.first.text
+          stmt_elements = xml.xpath('//a:Attribute', a: ASSERTION)
+          return {} if stmt_elements.nil?
+
+          stmt_elements.each do |element|
+            name  = element.attribute("AttributeName").value
+            value = element.text
 
             result[name] = value
           end
