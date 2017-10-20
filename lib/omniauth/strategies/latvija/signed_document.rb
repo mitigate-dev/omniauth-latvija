@@ -27,17 +27,14 @@ module OmniAuth::Strategies
     class SignedDocument
       DSIG = 'http://www.w3.org/2000/09/xmldsig#'.freeze
       XENC = 'http://www.w3.org/2001/04/xmlenc#'.freeze
-      CANON_CLASS = Nokogiri::XML::XML_C14N_EXCLUSIVE_1_0
-
-      attr_accessor :signed_element_id
+      CANON_MODE = Nokogiri::XML::XML_C14N_EXCLUSIVE_1_0
 
       def initialize(response, **opts)
-        @response = Nokogiri::XML(response)
-        if encrypted?
-          decryptor = OmniAuth::Strategies::Latvija::Decryptor.new(response, opts[:private_key])
-          decrypted_response = decryptor.decrypt
-          @response = Nokogiri::XML.parse(decrypted_response, &:noblanks)
-        end
+        @response = Nokogiri::XML.parse(response, &:noblanks)
+        return self unless encrypted?
+        decryptor = OmniAuth::Strategies::Latvija::Decryptor.new(response, opts[:private_key])
+        decrypted_response = decryptor.decrypt
+        @response = Nokogiri::XML.parse(decrypted_response, &:noblanks)
       end
 
       def validate!(idp_cert_fingerprint)
@@ -79,12 +76,11 @@ module OmniAuth::Strategies
         response_without_signature = @response.dup
         response_without_signature.xpath('//xmlns:Signature', xmlns: DSIG).remove
 
-        # check digests
         sig_element.xpath('.//xmlns:Reference', xmlns: DSIG).each do |ref|
           uri            = ref.attribute('URI').value
           hashed_element = response_without_signature.
             at_xpath("//*[@AssertionID='#{uri[1, uri.size]}']").
-            canonicalize(CANON_CLASS)
+            canonicalize(CANON_MODE)
           hash           = Base64.encode64(Digest::SHA1.digest(hashed_element)).chomp
           digest_value   = ref.xpath('.//xmlns:DigestValue', xmlns: DSIG).text
 
@@ -95,7 +91,7 @@ module OmniAuth::Strategies
       def validate_signature!(sig_element)
         signed_info_element = sig_element.
           at_xpath('.//xmlns:SignedInfo', xmlns: DSIG).
-          canonicalize(CANON_CLASS)
+          canonicalize(CANON_MODE)
         base64_signature    = sig_element.xpath('.//xmlns:SignatureValue', xmlns: DSIG).text
         signature           = Base64.decode64(base64_signature)
 

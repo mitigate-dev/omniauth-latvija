@@ -12,12 +12,14 @@ Provides the following authentication types:
 * Online bank
 * Citadele
 * Norvik banka
+* PrivatBank
+* eID
 * Lattelecom Mobile ID
 
 ## Installation
 
 ```ruby
-gem 'omniauth-latvija', :git => 'http://github.com/ebeigarts/omniauth-latvija.git'
+gem 'omniauth-latvija', git: 'http://github.com/ebeigarts/omniauth-latvija.git'
 ```
 
 ## Usage
@@ -29,9 +31,10 @@ Here's a quick example, adding the middleware to a Rails app in `config/initiali
 ```ruby
 Rails.application.config.middleware.use OmniAuth::Builder do
   provider :latvija, {
-    :endpoint => "https://epaktv.vraa.gov.lv/IVIS.LVP.STS/Default.aspx",
-    :certificate => File.read("/path/to/cert"),
-    :realm => "urn:federation:example.com"
+    endpoint:    "https://epaktv.vraa.gov.lv/IVIS.LVP.STS/Default.aspx",
+    certificate: File.read("/path/to/cert"),
+    private_key: File.read("/path/to/private_key"), # optional, if the response is crypted
+    realm:       "urn:federation:example.com"
   }
 end
 ```

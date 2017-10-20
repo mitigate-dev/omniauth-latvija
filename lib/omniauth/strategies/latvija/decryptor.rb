@@ -1,6 +1,3 @@
-require 'byebug'
-require 'xmlenc'
-
 module OmniAuth::Strategies
   class Latvija
     class Decryptor
