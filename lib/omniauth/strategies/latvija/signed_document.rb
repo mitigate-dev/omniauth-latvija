@@ -27,6 +27,7 @@ module OmniAuth::Strategies
     class SignedDocument
       DSIG = 'http://www.w3.org/2000/09/xmldsig#'.freeze
       XENC = 'http://www.w3.org/2001/04/xmlenc#'.freeze
+      CANON_CLASS = Nokogiri::XML::XML_C14N_EXCLUSIVE_1_0
 
       attr_accessor :signed_element_id
 
@@ -35,55 +36,72 @@ module OmniAuth::Strategies
         if encrypted?
           decryptor = OmniAuth::Strategies::Latvija::Decryptor.new(response, opts[:private_key])
           decrypted_response = decryptor.decrypt
-          @response = Nokogiri::XML(decrypted_response)
+          @response = Nokogiri::XML.parse(decrypted_response, &:noblanks)
         end
-
-        extract_signed_element_id
       end
 
       def validate!(idp_cert_fingerprint)
-        # get cert from response
-        base64_cert = @response.xpath('//xmlns:X509Certificate', xmlns: DSIG).text
-        cert_text   = Base64.decode64(base64_cert)
-        cert        = OpenSSL::X509::Certificate.new(cert_text)
-
-        # check cert matches registered idp cert
-        fingerprint = Digest::SHA1.hexdigest(cert.to_der)
-        raise ValidationError, 'Fingerprint mismatch' if fingerprint != idp_cert_fingerprint.gsub(/[^a-zA-Z0-9]/, '').downcase
-
+        validate_fingerprint!(idp_cert_fingerprint)
         # remove signature node
         sig_element = @response.xpath('//xmlns:Signature', xmlns: DSIG)
-        sig_element.remove
+
+        validate_digest!(sig_element)
+        validate_signature!(sig_element)
+        true
+      end
+
+      def nokogiri_xml
+        @response
+      end
+
+      private
+
+      def encrypted?
+        @response.xpath('//xenc:EncryptedData', 'xmlns:xenc' => XENC).any?
+      end
+
+      def certificate
+        @certificate ||= begin
+          base64_cert = @response.xpath('//xmlns:X509Certificate', xmlns: DSIG).text
+          cert_text   = Base64.decode64(base64_cert)
+          OpenSSL::X509::Certificate.new(cert_text)
+        end
+      end
+
+      def validate_fingerprint!(idp_cert_fingerprint)
+        fingerprint = Digest::SHA1.hexdigest(certificate.to_der)
+        if fingerprint != idp_cert_fingerprint.gsub(/[^a-zA-Z0-9]/, '').downcase
+          raise ValidationError, 'Fingerprint mismatch'
+        end
+      end
+
+      def validate_digest!(sig_element)
+        response_without_signature = @response.dup
+        response_without_signature.xpath('//xmlns:Signature', xmlns: DSIG).remove
 
         # check digests
         sig_element.xpath('.//xmlns:Reference', xmlns: DSIG).each do |ref|
           uri            = ref.attribute('URI').value
-          hashed_element = @response.xpath("//*[@AssertionID='#{uri[1, uri.size]}']").canonicalize
+          hashed_element = response_without_signature.
+            at_xpath("//*[@AssertionID='#{uri[1, uri.size]}']").
+            canonicalize(CANON_CLASS)
           hash           = Base64.encode64(Digest::SHA1.digest(hashed_element)).chomp
           digest_value   = ref.xpath('.//xmlns:DigestValue', xmlns: DSIG).text
 
           raise ValidationError, 'Digest mismatch' if hash != digest_value
         end
+      end
 
-        # verify signature
-        signed_info_element = Nokogiri::XML(sig_element.xpath('.//xmlns:SignedInfo', xmlns: DSIG).to_s).canonicalize
+      def validate_signature!(sig_element)
+        signed_info_element = sig_element.
+          at_xpath('.//xmlns:SignedInfo', xmlns: DSIG).
+          canonicalize(CANON_CLASS)
         base64_signature    = sig_element.xpath('.//xmlns:SignatureValue', xmlns: DSIG).text
         signature           = Base64.decode64(base64_signature)
 
-        unless cert.public_key.verify(OpenSSL::Digest::SHA1.new, signature, signed_info_element)
+        unless certificate.public_key.verify(OpenSSL::Digest::SHA1.new, signature, signed_info_element)
           raise ValidationError, 'Key validation error'
         end
-
-        true
-      end
-
-      def extract_signed_element_id
-        reference_element       = @response.xpath('//ds:Signature/ds:SignedInfo/ds:Reference', 'ds' => DSIG)
-        self.signed_element_id  = reference_element.attribute('URI').value unless reference_element.nil?
-      end
-
-      def encrypted?
-        @response.xpath('//xenc:EncryptedData', 'xmlns:xenc' => XENC).any?
       end
     end
   end

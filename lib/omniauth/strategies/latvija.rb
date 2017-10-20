@@ -55,8 +55,8 @@ module OmniAuth::Strategies
       else
         fail!(:invalid_response)
       end
-    # rescue Exception => e
-    #   fail!(:invalid_response, e)
+    rescue Exception => e
+      fail!(:invalid_response, e)
     end
 
     def auth_hash
