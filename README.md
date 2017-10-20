@@ -19,7 +19,7 @@ Provides the following authentication types:
 ## Installation
 
 ```ruby
-gem 'omniauth-latvija', git: 'http://github.com/ebeigarts/omniauth-latvija.git'
+gem 'omniauth-latvija', '~> 2.0'
 ```
 
 ## Usage
