@@ -1,3 +1,9 @@
+## 2.0.0
+
+- Support for encrypted responses #4
+- Switch XML parsing and canonicalization to Nokogiri #4
+- Switch to ruby 2.1 Syntax (removed support for Ruby <2.0) #4
+
 ## 1.1.1
 
 - Added 'wfresh' parameter support in request phase #2
