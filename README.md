@@ -32,8 +32,8 @@ Here's a quick example, adding the middleware to a Rails app in `config/initiali
 Rails.application.config.middleware.use OmniAuth::Builder do
   provider :latvija, {
     endpoint:    "https://epaktv.vraa.gov.lv/IVIS.LVP.STS/Default.aspx",
-    certificate: File.read("/path/to/cert"),
-    private_key: File.read("/path/to/private_key"), # optional, if the response is crypted
+    certificate: File.read("/path/to/cert.pem"),
+    private_key: File.read("/path/to/private_key.pem"), # mandatory, if the response is encrypted
     realm:       "urn:federation:example.com"
   }
 end
