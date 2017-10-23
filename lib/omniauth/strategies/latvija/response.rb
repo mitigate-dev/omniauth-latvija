@@ -12,10 +12,6 @@ module OmniAuth::Strategies
         @document = OmniAuth::Strategies::Latvija::SignedDocument.new(response, private_key: options[:private_key])
       end
 
-      def nokogiri_xml
-        @response
-      end
-
       def validate!
         @document.validate!(fingerprint)
       end

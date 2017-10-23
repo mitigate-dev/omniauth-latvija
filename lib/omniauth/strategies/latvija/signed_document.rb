@@ -31,7 +31,7 @@ module OmniAuth::Strategies
 
       def initialize(response, **opts)
         @response = Nokogiri::XML.parse(response, &:noblanks)
-        return self unless encrypted?
+        return unless encrypted?
         decryptor = OmniAuth::Strategies::Latvija::Decryptor.new(response, opts[:private_key])
         decrypted_response = decryptor.decrypt
         @response = Nokogiri::XML.parse(decrypted_response, &:noblanks)
@@ -39,7 +39,6 @@ module OmniAuth::Strategies
 
       def validate!(idp_cert_fingerprint)
         validate_fingerprint!(idp_cert_fingerprint)
-        # remove signature node
         sig_element = @response.xpath('//xmlns:Signature', xmlns: DSIG)
 
         validate_digest!(sig_element)
