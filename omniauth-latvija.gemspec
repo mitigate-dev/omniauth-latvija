@@ -18,8 +18,8 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency 'xmlenc'
   s.add_runtime_dependency 'nokogiri', '>= 1.5.1'
 
-  s.add_development_dependency 'rake'
-  s.add_development_dependency 'rspec', '~> 2.10'
+  s.add_development_dependency 'rake', '~> 12.1'
+  s.add_development_dependency 'rspec', '~> 3.7'
   s.add_development_dependency 'byebug'
   s.add_development_dependency 'simplecov'
   s.add_development_dependency 'rack-test'
