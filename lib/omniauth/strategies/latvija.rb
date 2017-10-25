@@ -67,14 +67,16 @@ module OmniAuth::Strategies
     def auth_hash
       OmniAuth::Utils.deep_merge(super,
         uid: "#{@response.attributes['givenname']} #{@response.attributes['surname']}, #{@response.attributes["privatepersonalidentifier"]}",
-        user_info: {
+        info: {
           name: "#{@response.attributes['givenname']} #{@response.attributes['surname']}",
           first_name: @response.attributes['givenname'],
           last_name: @response.attributes['surname'],
           private_personal_identifier: @response.attributes['privatepersonalidentifier']
         },
         authentication_method: @response.authentication_method,
-        extra: @response.attributes
+        extra: {
+          raw_info: @response.attributes
+        }
       )
     end
   end
