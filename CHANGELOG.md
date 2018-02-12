@@ -1,3 +1,7 @@
+## 3.0.0
+
+- Normalize omniauth attribute names #5
+
 ## 2.0.0
 
 - Support for encrypted responses #4
