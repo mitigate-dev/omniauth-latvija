@@ -34,6 +34,24 @@ module OmniAuth::Strategies
     option :certificate, nil
     option :private_key, nil
 
+    uid { "#{raw_info['givenname']} #{raw_info['surname']}, #{raw_info["privatepersonalidentifier"]}" }
+
+    info do
+      {
+        name: "#{raw_info['givenname']} #{raw_info['surname']}",
+        first_name: raw_info['givenname'],
+        last_name: raw_info['surname'],
+        private_personal_identifier: raw_info['privatepersonalidentifier']
+      }
+    end
+
+    extra do
+      {
+        raw_info: raw_info,
+        authentication_method: @response.authentication_method
+      }
+    end
+
     def request_phase
       params = {
         wa: 'wsignin1.0',
@@ -64,20 +82,8 @@ module OmniAuth::Strategies
       fail!(:invalid_response, e)
     end
 
-    def auth_hash
-      OmniAuth::Utils.deep_merge(super,
-        uid: "#{@response.attributes['givenname']} #{@response.attributes['surname']}, #{@response.attributes["privatepersonalidentifier"]}",
-        info: {
-          name: "#{@response.attributes['givenname']} #{@response.attributes['surname']}",
-          first_name: @response.attributes['givenname'],
-          last_name: @response.attributes['surname'],
-          private_personal_identifier: @response.attributes['privatepersonalidentifier']
-        },
-        authentication_method: @response.authentication_method,
-        extra: {
-          raw_info: @response.attributes
-        }
-      )
+    def raw_info
+      @response.attributes
     end
   end
 end

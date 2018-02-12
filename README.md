@@ -39,6 +39,33 @@ Rails.application.config.middleware.use OmniAuth::Builder do
 end
 ```
 
+
+## Auth Hash
+
+Here's an example hash available in `request.env['omniauth.auth']`
+
+```ruby
+{
+  provider: 'latvija',
+  uid: 'JANIS BERZINS, 12345612345',
+  info: {
+    name: 'JANIS BERZINS',
+    first_name: 'JANIS',
+    last_name: 'BERZINS',
+    private_personal_identifier: '12345612345'
+  },
+  extra: {
+    raw_info: {
+      name: 'JANIS BERZINS',
+      first_name: 'JANIS',
+      last_name: 'BERZINS',
+      private_personal_identifier: '12345612345'
+    },
+    authentication_method: 'SWEDBANK'
+  }
+}
+```
+
 ## References
 
 * http://docs.oasis-open.org/wsfed/federation/v1.2/os/ws-federation-1.2-spec-os.html
