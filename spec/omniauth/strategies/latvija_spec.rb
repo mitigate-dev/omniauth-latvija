@@ -34,9 +34,11 @@ describe OmniAuth::Strategies::Latvija, :type => :strategy do
       # puts "omniauth.strategy: #{last_request.env['omniauth.strategy'].inspect}"
 
       last_request.env['omniauth.error'].should be_nil
-      last_request.env['omniauth.auth']['user_info']['first_name'].should be_present
-      last_request.env['omniauth.auth']['user_info']['last_name'].should be_present
-      last_request.env['omniauth.auth']['user_info']['private_personal_identifier'].should be_present
+      last_request.env['omniauth.auth']['uid'].should be_present
+      last_request.env['omniauth.auth']['extra']['raw_info']['first_name'].should be_present
+      last_request.env['omniauth.auth']['info']['first_name'].should be_present
+      last_request.env['omniauth.auth']['info']['last_name'].should be_present
+      last_request.env['omniauth.auth']['info']['private_personal_identifier'].should be_present
     end
 
     it 'should fail after unsuccessful authentication with fingerprint mismatch' do
