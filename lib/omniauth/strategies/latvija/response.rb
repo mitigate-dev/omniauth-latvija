@@ -13,7 +13,7 @@ module OmniAuth::Strategies
       end
 
       def validate!
-        @document.validate!(fingerprint)
+        @document.validate!(fingerprint) && validate_conditions!
       end
 
       def xml
@@ -30,11 +30,15 @@ module OmniAuth::Strategies
       # Assuming there is only one value for each key
       def attributes
         @attributes ||= begin
+          attrs = {
+            'not_valid_before' => not_valid_before,
+            'not_valid_on_or_after' => not_valid_on_or_after
+          }
 
           stmt_elements = xml.xpath('//a:Attribute', a: ASSERTION)
-          return {} if stmt_elements.nil?
+          return attrs if stmt_elements.nil?
 
-          stmt_elements.each_with_object({}) do |element, result|
+          stmt_elements.each_with_object(attrs) do |element, result|
             name  = element.attribute('AttributeName').value
             value = element.text
 
@@ -48,6 +52,26 @@ module OmniAuth::Strategies
       def fingerprint
         cert = OpenSSL::X509::Certificate.new(options[:certificate])
         Digest::SHA1.hexdigest(cert.to_der).upcase.scan(/../).join(':')
+      end
+
+      def conditions_tag
+        @conditions_tag ||= xml.xpath('//saml:Conditions', saml: ASSERTION)
+      end
+
+      def not_valid_before
+        @not_valid_before ||= conditions_tag.attribute('NotBefore').value
+      end
+
+      def not_valid_on_or_after
+        @not_valid_on_or_after ||= conditions_tag.attribute('NotOnOrAfter').value
+      end
+
+      def validate_conditions!
+        if not_valid_on_or_after.present? && Time.current < Time.parse(not_valid_on_or_after)
+          true
+        else
+          raise ValidationError, 'Current time is on or after NotOnOrAfter condition'
+        end
       end
     end
   end

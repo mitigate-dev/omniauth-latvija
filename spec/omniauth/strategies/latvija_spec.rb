@@ -3,6 +3,10 @@ require File.expand_path('../../../spec_helper', __FILE__)
 describe OmniAuth::Strategies::Latvija, :type => :strategy do
   include OmniAuth::Test::StrategyTestCase
 
+  let(:fixtures_valid_from_inclusive) { Time.parse '2017-10-17T14:56:04.831Z' }
+  let(:fixtures_valid_to_not_inclusive) { Time.parse '2017-10-17T18:56:04.831Z' }
+  let(:freeze_time_at) { fixtures_valid_from_inclusive }
+
   def strategy
     [ OmniAuth::Strategies::Latvija,
       { certificate: certificate,
@@ -11,6 +15,12 @@ describe OmniAuth::Strategies::Latvija, :type => :strategy do
         private_key: private_key
       }
     ]
+  end
+
+  around do |example|
+    Timecop.freeze(freeze_time_at) do
+      example.run
+    end
   end
 
   describe '/auth/latvija' do
@@ -35,7 +45,8 @@ describe OmniAuth::Strategies::Latvija, :type => :strategy do
 
       last_request.env['omniauth.error'].should be_nil
       last_request.env['omniauth.auth']['uid'].should be_present
-      last_request.env['omniauth.auth']['extra']['raw_info']['first_name'].should be_present
+      last_request.env['omniauth.auth']['extra']['raw_info']['givenname'].should be_present
+      last_request.env['omniauth.auth']['extra']['raw_info']['surname'].should be_present
       last_request.env['omniauth.auth']['info']['first_name'].should be_present
       last_request.env['omniauth.auth']['info']['last_name'].should be_present
       last_request.env['omniauth.auth']['info']['private_personal_identifier'].should be_present
@@ -90,6 +101,40 @@ describe OmniAuth::Strategies::Latvija, :type => :strategy do
 
       last_request.env['omniauth.error.type'].should == :invalid_response
       last_request.env['omniauth.auth'].should be_nil
+    end
+
+    context 'timestamp validation' do
+      context 'when response is still valid' do
+        let(:freeze_time_at) { fixtures_valid_to_not_inclusive - 1.second }
+
+        it 'should not fail' do
+          post '/auth/latvija/callback', {
+            :wa => "wsignin1.0",
+            :wctx => "http://example.org/auth/latvija/callback",
+            :wresult => wresult_decrypted
+          }
+
+          last_request.env['omniauth.error'].should be_nil
+          last_request.env['omniauth.auth'].should be_present
+          last_request.env['omniauth.auth']['extra']['raw_info']['not_valid_before'].should be_present
+          last_request.env['omniauth.auth']['extra']['raw_info']['not_valid_on_or_after'].should be_present
+        end
+      end
+
+      context 'when response is no longer valid' do
+        let(:freeze_time_at) { fixtures_valid_to_not_inclusive }
+
+        it 'should fail' do
+          post '/auth/latvija/callback', {
+            :wa => "wsignin1.0",
+            :wctx => "http://example.org/auth/latvija/callback",
+            :wresult => wresult_decrypted
+          }
+
+          last_request.env['omniauth.error'].message.should == 'Current time is on or after NotOnOrAfter condition'
+          last_request.env['omniauth.auth'].should be_nil
+        end
+      end
     end
   end
 
