@@ -38,7 +38,7 @@ describe OmniAuth::Strategies::Latvija, :type => :strategy do
         :wresult => wresult_encrypted
       }
 
-      puts "omniauth.auth: #{last_request.env['omniauth.auth'].inspect}"
+      # puts "omniauth.auth: #{last_request.env['omniauth.auth'].inspect}"
       # puts "omniauth.error: #{last_request.env['omniauth.error'].inspect}"
       # puts "omniauth.error.type: #{last_request.env['omniauth.error.type'].inspect}"
       # puts "omniauth.strategy: #{last_request.env['omniauth.strategy'].inspect}"
@@ -104,7 +104,6 @@ describe OmniAuth::Strategies::Latvija, :type => :strategy do
     end
 
     context 'timestamp validation' do
-
       context 'when response has just become valid' do
         let(:freeze_time_at) { fixtures_valid_from_inclusive }
 
