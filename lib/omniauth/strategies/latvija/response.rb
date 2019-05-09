@@ -13,7 +13,7 @@ module OmniAuth::Strategies
       end
 
       def validate!
-        @document.validate!(fingerprint) && validate_timestamps!
+        @document.validate!(fingerprint) && validate_conditions!
       end
 
       def xml
@@ -66,16 +66,11 @@ module OmniAuth::Strategies
         @not_valid_on_or_after ||= conditions_tag.attribute('NotOnOrAfter').value
       end
 
-      def validate_timestamps!
-        current_timestamp = Time.current
-
-        already_valid = Time.parse(not_valid_before) <= current_timestamp
-        still_valid = current_timestamp < Time.parse(not_valid_on_or_after)
-
-        if already_valid && still_valid
+      def validate_conditions!
+        if not_valid_on_or_after.present? && Time.current < Time.parse(not_valid_on_or_after)
           true
         else
-          raise ValidationError, 'Timestamp error'
+          raise ValidationError, 'Current time is on or after NotOnOrAfter condition'
         end
       end
     end

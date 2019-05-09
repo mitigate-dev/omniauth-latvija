@@ -104,8 +104,8 @@ describe OmniAuth::Strategies::Latvija, :type => :strategy do
     end
 
     context 'timestamp validation' do
-      context 'when response has just become valid' do
-        let(:freeze_time_at) { fixtures_valid_from_inclusive }
+      context 'when response is still valid' do
+        let(:freeze_time_at) { fixtures_valid_to_not_inclusive - 1.second }
 
         it 'should not fail' do
           post '/auth/latvija/callback', {
@@ -121,21 +121,6 @@ describe OmniAuth::Strategies::Latvija, :type => :strategy do
         end
       end
 
-      context 'when response is not yet valid' do
-        let(:freeze_time_at) { fixtures_valid_from_inclusive - 1.second }
-
-        it 'should fail' do
-          post '/auth/latvija/callback', {
-            :wa => "wsignin1.0",
-            :wctx => "http://example.org/auth/latvija/callback",
-            :wresult => wresult_decrypted
-          }
-
-          last_request.env['omniauth.error'].message.should == "Timestamp error"
-          last_request.env['omniauth.auth'].should be_nil
-        end
-      end
-
       context 'when response is no longer valid' do
         let(:freeze_time_at) { fixtures_valid_to_not_inclusive }
 
@@ -146,7 +131,7 @@ describe OmniAuth::Strategies::Latvija, :type => :strategy do
             :wresult => wresult_decrypted
           }
 
-          last_request.env['omniauth.error'].message.should == "Timestamp error"
+          last_request.env['omniauth.error'].message.should == 'Current time is on or after NotOnOrAfter condition'
           last_request.env['omniauth.auth'].should be_nil
         end
       end
