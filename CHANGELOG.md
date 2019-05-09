@@ -1,3 +1,7 @@
+## 4.0.0
+
+- Check authentication expirity #6
+
 ## 3.0.0
 
 - Normalize omniauth attribute names #5
