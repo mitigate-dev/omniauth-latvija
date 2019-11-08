@@ -64,6 +64,3 @@
     <trust:KeyType>http://docs.oasis-open.org/ws-sx/ws-trust/200512/Bearer</trust:KeyType>
   </trust:RequestSecurityTokenResponse>
 </trust:RequestSecurityTokenResponseCollection>
-
-
-

@@ -26,6 +26,12 @@ module OmniAuth::Strategies
         end
       end
 
+      def name_identifier
+        @name_identifier ||= begin
+          xml.xpath('//saml:AuthenticationStatement/saml:Subject/saml:NameIdentifier', saml: ASSERTION).text()
+        end
+      end
+
       # A hash of all the attributes with the response.
       # Assuming there is only one value for each key
       def attributes

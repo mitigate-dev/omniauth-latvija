@@ -173,7 +173,7 @@ describe OmniAuth::Strategies::Latvija, :type => :strategy do
           :wresult => wresult_decrypted
         }
 
-        last_request.env['omniauth.auth'].tap { |x| pp x }
+        last_request.env['omniauth.auth']
       end
 
       it 'should return first name' do
@@ -194,6 +194,19 @@ describe OmniAuth::Strategies::Latvija, :type => :strategy do
 
       it 'should return any historical personal codes in extra info' do
         expect(response.dig('extra', 'raw_info', 'historical_privatepersonalidentifier')).to match_array(['12345678901'])
+      end
+
+      it 'should return NameIdentifier property as the auth UID' do
+        expect(response.dig('uid')).to eq('PK:32345678901')
+      end
+
+      it 'should return legacy UIDs for gem version <= 4.0' do
+        expect(response.dig('extra', 'legacy_uids')).to include('ODS KNISLIS, 32345678901')
+        expect(response.dig('extra', 'legacy_uids')).to include('ODS KNISLIS, 12345678901')
+      end
+
+      it 'should return legacy UIDs for persons that have changed their identifiers' do
+        expect(response.dig('extra', 'legacy_uids')).to include('PK:12345678901')
       end
     end
   end
