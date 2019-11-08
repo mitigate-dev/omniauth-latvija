@@ -160,18 +160,18 @@ describe OmniAuth::Strategies::Latvija, :type => :strategy do
   end
 
   def certificate
-    File.read('spec/fixtures/cert.pem')
+    File.read('spec/fixtures/private/cert.pem')
   end
 
   def private_key
-    File.read('spec/fixtures/key.pem')
+    File.read('spec/fixtures/private/key.pem')
   end
 
   def wresult_encrypted
-    File.read('spec/fixtures/wresult_encrypted.xml')
+    File.read('spec/fixtures/private/wresult_encrypted.xml')
   end
 
   def wresult_decrypted
-    File.read('spec/fixtures/wresult_decrypted.xml')
+    File.read('spec/fixtures/private/wresult_decrypted.xml')
   end
 end
