@@ -7,6 +7,11 @@ describe OmniAuth::Strategies::Latvija, :type => :strategy do
   let(:fixtures_valid_to_not_inclusive) { Time.parse '2017-10-17T18:56:04.831Z' }
   let(:freeze_time_at) { fixtures_valid_from_inclusive }
 
+  let(:certificate) { File.read('spec/fixtures/private/cert.pem') }
+  let(:private_key) { File.read('spec/fixtures/private/key.pem') }
+  let(:wresult_encrypted) { File.read('spec/fixtures/private/wresult_encrypted.xml') }
+  let(:wresult_decrypted) { File.read('spec/fixtures/private/wresult_decrypted.xml') }
+
   def strategy
     [ OmniAuth::Strategies::Latvija,
       { certificate: certificate,
@@ -53,6 +58,23 @@ describe OmniAuth::Strategies::Latvija, :type => :strategy do
     end
 
     it 'should fail after unsuccessful authentication with fingerprint mismatch' do
+      invalid_certificate = <<-EOS
+        -----BEGIN CERTIFICATE-----
+        MIICNDCCAaECEAKtZn5ORf5eV288mBle3cAwDQYJKoZIhvcNAQECBQAwXzELMAkG
+        A1UEBhMCVVMxIDAeBgNVBAoTF1JTQSBEYXRhIFNlY3VyaXR5LCBJbmMuMS4wLAYD
+        VQQLEyVTZWN1cmUgU2VydmVyIENlcnRpZmljYXRpb24gQXV0aG9yaXR5MB4XDTk0
+        MTEwOTAwMDAwMFoXDTEwMDEwNzIzNTk1OVowXzELMAkGA1UEBhMCVVMxIDAeBgNV
+        BAoTF1JTQSBEYXRhIFNlY3VyaXR5LCBJbmMuMS4wLAYDVQQLEyVTZWN1cmUgU2Vy
+        dmVyIENlcnRpZmljYXRpb24gQXV0aG9yaXR5MIGbMA0GCSqGSIb3DQEBAQUAA4GJ
+        ADCBhQJ+AJLOesGugz5aqomDV6wlAXYMra6OLDfO6zV4ZFQD5YRAUcm/jwjiioII
+        0haGN1XpsSECrXZogZoFokvJSyVmIlZsiAeP94FZbYQHZXATcXY+m3dM41CJVphI
+        uR2nKRoTLkoRWZweFdVJVCxzOmmCsZc5nG1wZ0jl3S3WyB57AgMBAAEwDQYJKoZI
+        hvcNAQECBQADfgBl3X7hsuyw4jrg7HFGmhkRuNPHoLQDQCYCPgmc4RKz0Vr2N6W3
+        YQO2WxZpO8ZECAyIUwxrl0nHPjXcbLm7qt9cuzovk2C2qUtN8iD3zV9/ZHuO3ABc
+        1/p3yjkWWW8O6tO1g39NTUJWdrTJXwT4OPjr0l91X817/OWOgHz8UA==
+        -----END CERTIFICATE-----
+      EOS
+
       post '/auth/latvija/callback', {
         :wa => "wsignin1.0",
         :wctx => "http://example.org/auth/latvija/callback",
@@ -136,42 +158,43 @@ describe OmniAuth::Strategies::Latvija, :type => :strategy do
         end
       end
     end
-  end
 
-  private
+    context 'specific properties' do
+      let(:wresult_decrypted) { File.read('spec/fixtures/wresult_multi_personal_codes_decrypted.xml') }
 
-  def invalid_certificate
-    <<-EOS
-      -----BEGIN CERTIFICATE-----
-      MIICNDCCAaECEAKtZn5ORf5eV288mBle3cAwDQYJKoZIhvcNAQECBQAwXzELMAkG
-      A1UEBhMCVVMxIDAeBgNVBAoTF1JTQSBEYXRhIFNlY3VyaXR5LCBJbmMuMS4wLAYD
-      VQQLEyVTZWN1cmUgU2VydmVyIENlcnRpZmljYXRpb24gQXV0aG9yaXR5MB4XDTk0
-      MTEwOTAwMDAwMFoXDTEwMDEwNzIzNTk1OVowXzELMAkGA1UEBhMCVVMxIDAeBgNV
-      BAoTF1JTQSBEYXRhIFNlY3VyaXR5LCBJbmMuMS4wLAYDVQQLEyVTZWN1cmUgU2Vy
-      dmVyIENlcnRpZmljYXRpb24gQXV0aG9yaXR5MIGbMA0GCSqGSIb3DQEBAQUAA4GJ
-      ADCBhQJ+AJLOesGugz5aqomDV6wlAXYMra6OLDfO6zV4ZFQD5YRAUcm/jwjiioII
-      0haGN1XpsSECrXZogZoFokvJSyVmIlZsiAeP94FZbYQHZXATcXY+m3dM41CJVphI
-      uR2nKRoTLkoRWZweFdVJVCxzOmmCsZc5nG1wZ0jl3S3WyB57AgMBAAEwDQYJKoZI
-      hvcNAQECBQADfgBl3X7hsuyw4jrg7HFGmhkRuNPHoLQDQCYCPgmc4RKz0Vr2N6W3
-      YQO2WxZpO8ZECAyIUwxrl0nHPjXcbLm7qt9cuzovk2C2qUtN8iD3zV9/ZHuO3ABc
-      1/p3yjkWWW8O6tO1g39NTUJWdrTJXwT4OPjr0l91X817/OWOgHz8UA==
-      -----END CERTIFICATE-----
-    EOS
-  end
+      before(:each) do
+        allow_any_instance_of(OmniAuth::Strategies::Latvija::SignedDocument).to receive(:validate!).and_return(true)
+      end
 
-  def certificate
-    File.read('spec/fixtures/private/cert.pem')
-  end
+      let(:response) do
+        post '/auth/latvija/callback', {
+          :wa => "wsignin1.0",
+          :wctx => "http://example.org/auth/latvija/callback",
+          :wresult => wresult_decrypted
+        }
 
-  def private_key
-    File.read('spec/fixtures/private/key.pem')
-  end
+        last_request.env['omniauth.auth'].tap { |x| pp x }
+      end
 
-  def wresult_encrypted
-    File.read('spec/fixtures/private/wresult_encrypted.xml')
-  end
+      it 'should return first name' do
+        expect(response.dig('info', 'first_name')).to eq('ODS')
+      end
 
-  def wresult_decrypted
-    File.read('spec/fixtures/private/wresult_decrypted.xml')
+      it 'should return last name' do
+        expect(response.dig('info', 'last_name')).to eq('KNISLIS')
+      end
+
+      it 'should return combined name' do
+        expect(response.dig('info', 'name')).to eq('ODS KNISLIS')
+      end
+
+      it 'should return primary personal code, as specified by OriginalIssuer param' do
+        expect(response.dig('info', 'private_personal_identifier')).to eq('32345678901')
+      end
+
+      it 'should return any historical personal codes in extra info' do
+        expect(response.dig('extra', 'raw_info', 'historical_privatepersonalidentifier')).to match_array(['12345678901'])
+      end
+    end
   end
 end

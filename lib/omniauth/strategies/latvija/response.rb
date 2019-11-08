@@ -32,17 +32,27 @@ module OmniAuth::Strategies
         @attributes ||= begin
           attrs = {
             'not_valid_before' => not_valid_before,
-            'not_valid_on_or_after' => not_valid_on_or_after
+            'not_valid_on_or_after' => not_valid_on_or_after,
+            'historical_privatepersonalidentifier' => []
           }
 
           stmt_elements = xml.xpath('//a:Attribute', a: ASSERTION)
           return attrs if stmt_elements.nil?
 
           stmt_elements.each_with_object(attrs) do |element, result|
-            name  = element.attribute('AttributeName').value
+            name = element.attribute('AttributeName').value
             value = element.text
 
-            result[name] = value
+            case name
+            when 'privatepersonalidentifier' # person can change their identifier, service will return all the versions
+              if element.attribute('OriginalIssuer') # this is the primary identifier, as returned by third party auth service
+                result[name] = value
+              else
+                result['historical_privatepersonalidentifier'] << value
+              end
+            else
+              result[name] = value
+            end
           end
         end
       end
