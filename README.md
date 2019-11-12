@@ -47,7 +47,7 @@ Here's an example hash available in `request.env['omniauth.auth']`
 ```ruby
 {
   provider: 'latvija',
-  uid: 'JANIS BERZINS, 12345612345',
+  uid: 'PK:12345612345',
   info: {
     name: 'JANIS BERZINS',
     first_name: 'JANIS',
@@ -56,14 +56,15 @@ Here's an example hash available in `request.env['omniauth.auth']`
   },
   extra: {
     raw_info: {
-      name: 'JANIS BERZINS',
-      first_name: 'JANIS',
-      last_name: 'BERZINS',
-      private_personal_identifier: '12345612345',
+      givenname: 'JANIS',
+      surname: 'BERZINS',
+      privatepersonalidentifier: '12345612345',
+      historical_privatepersonalidentifier: [],
       not_valid_before: '2019-05-09T07:29:41Z',
       not_valid_on_or_after: '2019-05-09T08:29:41Z'
     },
-    authentication_method: 'SWEDBANK'
+    authentication_method: 'SWEDBANK',
+    legacy_uids: ['JANIS BERZINS, 12345612345']
   }
 }
 ```
