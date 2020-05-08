@@ -1,6 +1,6 @@
 require 'time'
 require 'openssl'
-require 'digest/sha1'
+require 'digest/sha2'
 require 'xmlenc'
 require 'nokogiri'
 require 'omniauth/strategies/latvija/response'

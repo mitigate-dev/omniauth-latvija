@@ -67,7 +67,7 @@ module OmniAuth::Strategies
 
       def fingerprint
         cert = OpenSSL::X509::Certificate.new(options[:certificate])
-        Digest::SHA1.hexdigest(cert.to_der).upcase.scan(/../).join(':')
+        Digest::SHA256.hexdigest(cert.to_der).upcase.scan(/../).join(':')
       end
 
       def conditions_tag
