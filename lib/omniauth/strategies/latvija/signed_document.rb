@@ -71,7 +71,7 @@ module OmniAuth::Strategies
 
       def signature_method_class(sig_element)
         value = sig_element.xpath('.//xmlns:SignatureMethod', xmlns: DSIG).attribute('Algorithm').value
-        value == "#{DSIG}rsa-sha1") ? OpenSSL::Digest::SHA1 : OpenSSL::Digest::SHA256
+        value == "#{DSIG}rsa-sha1" ? OpenSSL::Digest::SHA1 : OpenSSL::Digest::SHA256
       end
 
       def validate_fingerprint!(idp_cert_fingerprint)
