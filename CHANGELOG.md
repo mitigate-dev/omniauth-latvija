@@ -1,3 +1,7 @@
+## 6.0.0
+
+- Add SHA256 support #9
+
 ## 5.0.0
 
 - **BREAKING CHANGE**: use the identifier returned by latvija.lv as auth UID, to prevent surname changes resetting user identity. Without changes in caller code, existing users will not be able to log in. Previously used versions of UID can be found under `extra.legacy_uids` key in auth response.
