@@ -64,8 +64,18 @@ module OmniAuth::Strategies
         end
       end
 
+      def digest_method_class(reference)
+        value = reference.xpath('.//xmlns:DigestMethod', xmlns: DSIG).attribute('Algorithm').value
+        value == "#{DSIG}sha1" ? Digest::SHA1 : Digest::SHA256
+      end
+
+      def signature_method_class(sig_element)
+        value = sig_element.xpath('.//xmlns:SignatureMethod', xmlns: DSIG).attribute('Algorithm').value
+        value == "#{DSIG}rsa-sha1" ? OpenSSL::Digest::SHA1 : OpenSSL::Digest::SHA256
+      end
+
       def validate_fingerprint!(idp_cert_fingerprint)
-        fingerprint = Digest::SHA1.hexdigest(certificate.to_der)
+        fingerprint = Digest::SHA256.hexdigest(certificate.to_der)
         if fingerprint != idp_cert_fingerprint.gsub(/[^a-zA-Z0-9]/, '').downcase
           raise ValidationError, 'Fingerprint mismatch'
         end
@@ -80,7 +90,7 @@ module OmniAuth::Strategies
           hashed_element = response_without_signature.
             at_xpath("//*[@AssertionID='#{uri[1, uri.size]}']").
             canonicalize(CANON_MODE)
-          hash           = Base64.encode64(Digest::SHA1.digest(hashed_element)).chomp
+          hash           = Base64.encode64(digest_method_class(ref).digest(hashed_element)).chomp
           digest_value   = ref.xpath('.//xmlns:DigestValue', xmlns: DSIG).text
 
           raise ValidationError, 'Digest mismatch' if hash != digest_value
@@ -94,7 +104,7 @@ module OmniAuth::Strategies
         base64_signature    = sig_element.xpath('.//xmlns:SignatureValue', xmlns: DSIG).text
         signature           = Base64.decode64(base64_signature)
 
-        unless certificate.public_key.verify(OpenSSL::Digest::SHA1.new, signature, signed_info_element)
+        unless certificate.public_key.verify(signature_method_class(sig_element).new, signature, signed_info_element)
           raise ValidationError, 'Key validation error'
         end
       end
