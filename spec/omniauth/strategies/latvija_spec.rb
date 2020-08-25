@@ -159,7 +159,7 @@ describe OmniAuth::Strategies::Latvija, :type => :strategy do
       end
     end
 
-    context 'specific properties' do
+    context 'when response has multiple private identifiers' do
       let(:wresult_decrypted) { File.read('spec/fixtures/wresult_multi_personal_codes_decrypted.xml') }
 
       before(:each) do
@@ -207,6 +207,36 @@ describe OmniAuth::Strategies::Latvija, :type => :strategy do
 
       it 'should return legacy UIDs for persons that have changed their identifiers' do
         expect(response.dig('extra', 'legacy_uids')).to include('PK:12345678901')
+      end
+    end
+
+    context 'when response has single private identifier without original issuer parameter' do
+      let(:wresult_decrypted) { File.read('spec/fixtures/wresult_single_personal_code_without_issuer_decrypted.xml') }
+
+      before(:each) do
+        allow_any_instance_of(OmniAuth::Strategies::Latvija::SignedDocument).to receive(:validate!).and_return(true)
+      end
+
+      let(:response) do
+        post '/auth/latvija/callback', {
+          :wa => "wsignin1.0",
+          :wctx => "http://example.org/auth/latvija/callback",
+          :wresult => wresult_decrypted
+        }
+
+        last_request.env['omniauth.auth']
+      end
+
+      it 'should return primary personal code' do
+        expect(response.dig('info', 'private_personal_identifier')).to eq('32345678901')
+      end
+
+      it 'should not return historical personal codes in extra info' do
+        expect(response.dig('extra', 'raw_info', 'historical_privatepersonalidentifier')).to be_empty
+      end
+
+      it 'should return NameIdentifier property as the auth UID' do
+        expect(response.dig('uid')).to eq('PK:32345678901')
       end
     end
   end
