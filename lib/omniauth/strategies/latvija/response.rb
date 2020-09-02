@@ -42,8 +42,11 @@ module OmniAuth::Strategies
             'historical_privatepersonalidentifier' => []
           }
 
-          stmt_elements = xml.xpath('//a:Attribute', a: ASSERTION)
+          stmt_elements = xml.xpath('//saml:Attribute', saml: ASSERTION)
+
           return attrs if stmt_elements.nil?
+
+          identifiers = stmt_elements.xpath("//saml:Attribute[@AttributeName='privatepersonalidentifier']", saml: ASSERTION)
 
           stmt_elements.each_with_object(attrs) do |element, result|
             name = element.attribute('AttributeName').value
@@ -51,7 +54,7 @@ module OmniAuth::Strategies
 
             case name
             when 'privatepersonalidentifier' # person can change their identifier, service will return all the versions
-              if element.attribute('OriginalIssuer') # this is the primary identifier, as returned by third party auth service
+              if identifiers.length == 1 || element.attribute('OriginalIssuer') # this is the primary identifier, as returned by third party auth service
                 result[name] = value
               else
                 result['historical_privatepersonalidentifier'] << value
