@@ -1,3 +1,7 @@
+## 6.1.0
+
+- Use single private identifier as primary #10
+
 ## 6.0.0
 
 - Add SHA256 support #9
