@@ -63,7 +63,8 @@ Here's an example hash available in `request.env['omniauth.auth']`
       not_valid_before: '2019-05-09T07:29:41Z',
       not_valid_on_or_after: '2019-05-09T08:29:41Z'
     },
-    authentication_method: 'SWEDBANK',
+    authentication_method: 'URN:IVIS:100001:AM.BANK-SWED',
+    original_issuer: 'Swedbanka',
     legacy_uids: ['JANIS BERZINS, 12345612345']
   }
 }
