@@ -1,3 +1,7 @@
+## 6.2.0
+
+- Add original issuer to response #11
+
 ## 6.1.0
 
 - Use single private identifier as primary #10
