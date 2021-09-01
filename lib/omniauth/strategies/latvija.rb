@@ -48,6 +48,7 @@ module OmniAuth::Strategies
       {
         raw_info: raw_info,
         authentication_method: @response.authentication_method,
+        original_issuer: @response.original_issuer,
         legacy_uids: legacy_uids
       }
     end

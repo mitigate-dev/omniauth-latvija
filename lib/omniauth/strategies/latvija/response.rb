@@ -26,6 +26,12 @@ module OmniAuth::Strategies
         end
       end
 
+      def original_issuer
+        @original_issuer ||= begin
+          xml.xpath("//saml:Attribute[@AttributeName='givenname']", saml: ASSERTION).attribute('OriginalIssuer')
+        end
+      end
+
       def name_identifier
         @name_identifier ||= begin
           xml.xpath('//saml:AuthenticationStatement/saml:Subject/saml:NameIdentifier', saml: ASSERTION).text()
