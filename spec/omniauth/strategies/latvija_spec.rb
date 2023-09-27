@@ -1,5 +1,7 @@
 require File.expand_path('../../../spec_helper', __FILE__)
 
+OmniAuth.config.allowed_request_methods = [:get, :post]
+
 describe OmniAuth::Strategies::Latvija, :type => :strategy do
   include OmniAuth::Test::StrategyTestCase
 
