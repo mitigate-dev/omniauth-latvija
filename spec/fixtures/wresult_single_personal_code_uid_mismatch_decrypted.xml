@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<trust:RequestSecurityTokenResponseCollection xmlns:trust="http://docs.oasis-open.org/ws-sx/ws-trust/200512">
+  <trust:RequestSecurityTokenResponse Context="https://demo.latvijasnotars.lv/users/auth/latvija/callback">
+    <trust:Lifetime>
+      <wsu:Created xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">2019-11-05T13:57:02.777Z</wsu:Created>
+      <wsu:Expires xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">2019-11-05T17:57:02.777Z</wsu:Expires>
+    </trust:Lifetime>
+    <wsp:AppliesTo xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy">
+      <wsa:EndpointReference xmlns:wsa="http://www.w3.org/2005/08/addressing">
+        <wsa:Address>https://example.com</wsa:Address>
+      </wsa:EndpointReference>
+    </wsp:AppliesTo>
+    <trust:RequestedSecurityToken>
+      <saml:Assertion xmlns:saml="urn:oasis:names:tc:SAML:1.0:assertion" MajorVersion="1" MinorVersion="1" AssertionID="_fe766b93-7b30-43cb-9f54-7e66c7421a26" Issuer="http://www.latvija.lv/sts" IssueInstant="2019-11-04T14:12:08.977Z">
+        <saml:Conditions NotBefore="2019-11-05T13:57:02.777Z" NotOnOrAfter="2019-11-05T17:57:02.777Z">
+          <saml:AudienceRestrictionCondition>
+            <saml:Audience>https://ivis.eps.gov.lv/LVP.Sitecore</saml:Audience>
+          </saml:AudienceRestrictionCondition>
+        </saml:Conditions>
+        <saml:AttributeStatement>
+          <saml:Subject>
+            <saml:NameIdentifier Format="urn:ivis:100001:name.id-viss">PK:32345678901</saml:NameIdentifier>
+            <saml:SubjectConfirmation>
+              <saml:ConfirmationMethod>urn:oasis:names:tc:SAML:1.0:cm:bearer</saml:ConfirmationMethod>
+            </saml:SubjectConfirmation>
+          </saml:Subject>
+          <saml:Attribute AttributeName="givenname" AttributeNamespace="http://schemas.xmlsoap.org/ws/2005/05/identity/claims" a:OriginalIssuer="TESTidp"
+            xmlns:a="http://schemas.xmlsoap.org/ws/2009/09/identity/claims">
+            <saml:AttributeValue>ODS</saml:AttributeValue>
+          </saml:Attribute>
+          <saml:Attribute AttributeName="surname" AttributeNamespace="http://schemas.xmlsoap.org/ws/2005/05/identity/claims" a:OriginalIssuer="TESTidp"
+            xmlns:a="http://schemas.xmlsoap.org/ws/2009/09/identity/claims">
+            <saml:AttributeValue>KNISLIS</saml:AttributeValue>
+          </saml:Attribute>
+          <saml:Attribute AttributeName="privatepersonalidentifier" AttributeNamespace="http://schemas.xmlsoap.org/ws/2005/05/identity/claims" a:OriginalIssuer="TESTidp"
+            xmlns:a="http://schemas.xmlsoap.org/ws/2009/09/identity/claims">
+            <saml:AttributeValue>01018012345</saml:AttributeValue>
+          </saml:Attribute>
+          <saml:Attribute AttributeName="citizenQAALevel" AttributeNamespace="http://ivis.eps.gov.lv/schema/identity/claims">
+            <saml:AttributeValue a:type="tn:integer"
+              xmlns:tn="http://www.w3.org/2001/XMLSchema"
+              xmlns:a="http://www.w3.org/2001/XMLSchema-instance">4</saml:AttributeValue>
+          </saml:Attribute>
+          <saml:Attribute AttributeName="109x34" AttributeNamespace="http://ivis.eps.gov.lv/schema/media/image">
+            <saml:AttributeValue>https://epakvisstv.vraa.gov.lv/STS/VISS.LVP.STS/Image.ashx?id=am-test</saml:AttributeValue>
+          </saml:Attribute>
+        </saml:AttributeStatement>
+        <saml:AuthenticationStatement AuthenticationMethod="urn:ivis:100001:am-idp40-wif" AuthenticationInstant="2019-11-05T13:57:02.511Z">
+          <saml:Subject>
+            <saml:NameIdentifier Format="urn:ivis:100001:name.id-viss">PK:32345678901</saml:NameIdentifier>
+            <saml:SubjectConfirmation>
+              <saml:ConfirmationMethod>urn:oasis:names:tc:SAML:1.0:cm:bearer</saml:ConfirmationMethod>
+            </saml:SubjectConfirmation>
+          </saml:Subject>
+          <saml:SubjectLocality IPAddress="127.0.0.1" />
+        </saml:AuthenticationStatement>
+      </saml:Assertion>
+    </trust:RequestedSecurityToken>
+    <trust:TokenType>urn:oasis:names:tc:SAML:1.0:assertion</trust:TokenType>
+    <trust:RequestType>http://docs.oasis-open.org/ws-sx/ws-trust/200512/Issue</trust:RequestType>
+    <trust:KeyType>http://docs.oasis-open.org/ws-sx/ws-trust/200512/Bearer</trust:KeyType>
+  </trust:RequestSecurityTokenResponse>
+</trust:RequestSecurityTokenResponseCollection>
