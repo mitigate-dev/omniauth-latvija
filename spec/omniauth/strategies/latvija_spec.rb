@@ -243,7 +243,7 @@ describe OmniAuth::Strategies::Latvija, :type => :strategy do
     end
 
     context 'when response NameIdentifier code does not match real private personal identifier' do
-      let(:wresult_decrypted) { File.read('spec/fixtures/wresult_single_personal_code_uid_mismatch_decrypted.xml') }
+      let(:wresult_decrypted) { File.read('spec/fixtures/wresult_single_personal_code_nameidentifier_mismatch_decrypted.xml') }
 
       before(:each) do
         allow_any_instance_of(OmniAuth::Strategies::Latvija::SignedDocument).to receive(:validate!).and_return(true)
