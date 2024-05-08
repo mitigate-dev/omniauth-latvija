@@ -88,7 +88,7 @@ module OmniAuth::Strategies
     end
 
     def uid
-      @response.name_identifier
+      "PK:#{raw_info['privatepersonalidentifier']}"
     end
 
     def full_name
